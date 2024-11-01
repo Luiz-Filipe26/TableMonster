@@ -4,6 +4,6 @@ class GameManager {
     private val drawPile: Deck = Deck()
 
     fun processGame() {
-
+        val deck = Deck()
     }
 }
