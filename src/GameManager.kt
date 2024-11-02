@@ -4,6 +4,13 @@ class GameManager {
     private val drawPile: Deck = Deck()
 
     fun processGame() {
-        val deck = Deck()
+        var card = drawPile.getCard()
+
+        while (card != null) {
+            println("Carta puxada: ${card.name}")
+            card = drawPile.getCard()
+        }
+
+        println("Todas as cartas foram distribuídas.")
     }
 }
