@@ -4,6 +4,10 @@ class GameManager {
     private val drawPile = Deck()
     private val NUMBER_OF_PLAYERS = 2
     private val DEFAULT_PLAYER_LIFE = 10000
+    companion object {
+        const val MAXIMUM_NUMBER_OF_CARDS = 10
+        const val MAXIMUM_NUMBER_OF_MONSTERS = 5
+    }
 
     fun processGame() {
         if (!drawPile.hasCard()) {
@@ -100,7 +104,27 @@ class GameManager {
     }
 
     private fun positionNewMonster(player: Player) {
-        println("${player.name} está posicionando um novo monstro...")
+        val monstersCardsNames = player.getMonstersCardsNames()
+
+        if(monstersCardsNames.isEmpty()) {
+            println("Não existe uma carta com monstro para posicionar!")
+            return
+        }
+
+        println("Cartas de monstros disponíveis para posicionar:")
+        monstersCardsNames.forEachIndexed { cardIndex, cardName ->
+            println("$cardIndex- $cardName")
+        }
+        print("Digite o número do monstro que quer posicionar: ")
+        var monsterIndex = readln().toIntOrNull()
+        while(monsterIndex == null) {
+            print("Digite um valor válido")
+            monsterIndex = readln().toIntOrNull()
+        }
+
+        TODO("Position new monster and change with table if necesary")
+
+
     }
 
     private fun equipMonster(player: Player) {

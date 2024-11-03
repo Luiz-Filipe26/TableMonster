@@ -3,8 +3,8 @@ class Player(
     private var life: Int,
     private val cardList: MutableList<Card> = mutableListOf(),
     private val monstersList: MutableList<Monster> = mutableListOf(),
-    private val MAXIMUM_NUMBER_OF_CARDS: Int = 10,
-    private val MAXIMUM_NUMBER_OF_MONSTERS: Int = 5
+    private var maximumNumberOfCards: Int = GameManager.MAXIMUM_NUMBER_OF_CARDS,
+    private var maximumNumberOfMonsters: Int = GameManager.MAXIMUM_NUMBER_OF_MONSTERS
 ) {
     fun receiveDamage(damage: Int) {
         life -= damage
@@ -19,11 +19,15 @@ class Player(
     }
 
     fun canPositionNewMonster(): Boolean {
-        return monstersList.size > MAXIMUM_NUMBER_OF_MONSTERS
+        return monstersList.size > maximumNumberOfMonsters
     }
 
     fun hasExceededMaximumNumberOfCards(): Boolean {
-        return cardList.size > MAXIMUM_NUMBER_OF_CARDS
+        return cardList.size > maximumNumberOfCards
+    }
+
+    fun getMonstersCardsNames(): List<String> {
+        return cardList.filter{ it.type == CardType.MONSTER }.map{ it.name }
     }
 
     fun getCardNames(): List<String> {
