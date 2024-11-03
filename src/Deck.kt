@@ -38,4 +38,8 @@ class Deck {
         if (currentCard >= cardList.size) return null
         return cardList[currentCard++]
     }
+
+    fun hasCard(): Boolean {
+        return cardList.isNotEmpty()
+    }
 }
