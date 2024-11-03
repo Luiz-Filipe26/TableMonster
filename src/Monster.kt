@@ -1,6 +1,7 @@
 class Monster(
     val appliedCards: MutableList<Card> = mutableListOf(),
-    val isInDefenseState: Boolean = false,
+    var isInDefenseState: Boolean = false,
+    var name: String,
     var life: Int,
 ) {
 
