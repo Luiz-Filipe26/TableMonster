@@ -121,10 +121,26 @@ class GameManager {
             print("Digite um valor válido")
             monsterIndex = readln().toIntOrNull()
         }
+        val monsterName = monstersCardsNames[monsterIndex]
+        val monsterCard = player.getCardByName(monsterName)
 
-        TODO("Position new monster and change with table if necesary")
+        if(monsterCard == null) {
+            println("Nenhuma carta encontrada com esse nome")
+            return
+        }
 
+        println("Escolha o modo de posicionamento: 1 - Ataque | 2 - Defesa")
+        val monsterState = readln().toIntOrNull()
 
+        val monster = Monster(
+            name = monsterName,
+            isInDefenseState = monsterState == 2,
+            life = 100
+        )
+
+        player.positionMonster(monster)
+        val cardIndex = player.getCardIndex(monsterCard)
+        player.removeCard(cardIndex)
     }
 
     private fun equipMonster(player: Player) {

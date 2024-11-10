@@ -41,4 +41,12 @@ class Player(
     fun removeCard(cardPosition: Int) {
         cardList.removeAt(cardPosition)
     }
+
+    fun getCardByName(cardName: String): Card? {
+        return cardList.find { it.name == cardName }
+    }
+
+    fun getCardIndex(card: Card): Int {
+        return cardList.indexOf(card)
+    }
 }
