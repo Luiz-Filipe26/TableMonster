@@ -138,6 +138,11 @@ class GameManager {
             life = 100
         )
 
+        if (!player.canPositionNewMonster()) {
+            println("Numero de monstros maximo atingido!")
+            return
+        }
+
         player.positionMonster(monster)
         val cardIndex = player.getCardIndex(monsterCard)
         player.removeCard(cardIndex)

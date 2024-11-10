@@ -19,7 +19,7 @@ class Player(
     }
 
     fun canPositionNewMonster(): Boolean {
-        return monstersList.size > maximumNumberOfMonsters
+        return monstersList.size < maximumNumberOfMonsters
     }
 
     fun hasExceededMaximumNumberOfCards(): Boolean {
