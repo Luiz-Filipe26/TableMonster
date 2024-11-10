@@ -30,12 +30,20 @@ class Player(
         return cardList.filter{ it.type == CardType.MONSTER }.map{ it.name }
     }
 
+    fun getEquipamentCardNames(): List<String> {
+        return cardList.filter{ it.type == CardType.EQUIPAMENT }.map{ it.name }
+    }
+
     fun getCardNames(): List<String> {
         return cardList.map { it.name }
     }
 
     fun getMonsterNames(): List<String> {
         return monstersList.map { it.name }
+    }
+
+    fun getMonsterByName(monsterName: String): Monster? {
+        return monstersList.find { it.name == monsterName }
     }
 
     fun removeCard(cardPosition: Int) {

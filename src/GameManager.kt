@@ -104,6 +104,11 @@ class GameManager {
     }
 
     private fun positionNewMonster(player: Player) {
+        if (!player.canPositionNewMonster()) {
+            println("Numero de monstros maximo atingido!")
+            return
+        }
+
         val monstersCardsNames = player.getMonstersCardsNames()
 
         if(monstersCardsNames.isEmpty()) {
@@ -138,11 +143,6 @@ class GameManager {
             life = 100
         )
 
-        if (!player.canPositionNewMonster()) {
-            println("Numero de monstros maximo atingido!")
-            return
-        }
-
         player.positionMonster(monster)
         val cardIndex = player.getCardIndex(monsterCard)
         player.removeCard(cardIndex)
@@ -150,6 +150,62 @@ class GameManager {
 
     private fun equipMonster(player: Player) {
         println("${player.name} está equipando um monstro...")
+
+        val equipamentCardNames = player.getEquipamentCardNames()
+
+        if(equipamentCardNames.isEmpty()) {
+            println("Nao ha nenhum equipamento disponivel.")
+            return
+        }
+
+        println("Cartas de equipamento disponíveis para equipar:")
+        equipamentCardNames.forEachIndexed { cardIndex, cardName ->
+            println("$cardIndex- $cardName")
+        }
+
+        print("Digite o número do equipamento que deseja equipar: ")
+        var equipamentIndex = readln().toIntOrNull()
+        while(equipamentIndex == null) {
+            print("Digite um valor válido")
+            equipamentIndex = readln().toIntOrNull()
+        }
+
+        val equipamentName = equipamentCardNames[equipamentIndex]
+        val equipamentCard = player.getCardByName(equipamentName)
+
+        if(equipamentCard == null) {
+            println("Equipamento nao encontrado")
+            return
+        }
+
+        val monstersName = player.getMonsterNames()
+
+        if (monstersName.isEmpty()) {
+            print("Nao ha nenhum monstro posicionado")
+            return
+        }
+
+        println("Monstros disponiveis para equipar:")
+        monstersName.forEachIndexed { cardIndex, cardName ->
+            println("$cardIndex- $cardName")
+        }
+
+        print("Digite o número do monstro que deseja equipar: ")
+        var monsterIndex = readln().toIntOrNull()
+        while(monsterIndex == null) {
+            print("Digite um valor válido")
+            monsterIndex = readln().toIntOrNull()
+        }
+
+        val monsterName = monstersName[monsterIndex]
+        val monster = player.getMonsterByName(monsterName)
+
+        if(monster == null) {
+           println("Monstro nao encontrado")
+           return
+        }
+
+        monster.appliedCards.add(equipamentCard)
     }
 
     private fun discardCard(player: Player) {
