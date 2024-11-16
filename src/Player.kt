@@ -46,6 +46,10 @@ class Player(
         return monstersList
     }
 
+    fun getCardList(): List<Card> {
+        return cardList
+    }
+
     fun getMonsterByName(monsterName: String): Monster? {
         return monstersList.find { it.name == monsterName }
     }

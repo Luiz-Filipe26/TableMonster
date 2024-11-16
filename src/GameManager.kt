@@ -36,6 +36,8 @@ class GameManager {
             println("Vez do jogador ${currentPlayer.name}.")
             getNewCardFromDrawPile(currentPlayer)
 
+            showCurrentHand(currentPlayer)
+
             printOptions()
             var option = readln()
             while (option.length != 1 || !option.matches(Regex("[1-6]"))) {
@@ -90,14 +92,14 @@ class GameManager {
     }
 
     private fun printTableState(playerList: List<Player>) {
-        // Define table headers
-        val headers = listOf("Monster Name", "Base ATK", "Base DEF", "Total ATK", "Total DEF", "Equipment")
+        val headers = listOf("Nome Carta", "ATK Base", "DEF Base", "Total ATK", "Total DEF", "Equipamento(s)")
 
         for (player in playerList) {
-            println("${player.name}'s Table:")
+            println("Tabuleiro do(a) ${player.name}:")
 
-            // Calculate column widths dynamically
             val monsters = player.getMonsterList()
+
+            //Calcular espacamento
             val colWidths = headers.indices.map { i ->
                 maxOf(
                     headers[i].length,
@@ -115,12 +117,11 @@ class GameManager {
                 )
             }
 
-            // Print table header
             printSeparator(colWidths)
             printRow(headers, colWidths)
             printSeparator(colWidths)
 
-            // Print each monster's details
+            //Printa os detalhes do monstro
             for (monster in monsters) {
                 val row = listOf(
                     monster.name,
@@ -265,6 +266,60 @@ class GameManager {
 
     private fun discardCard(player: Player) {
         println("${player.name} está descartando uma carta...")
+
+        println("Cartas na sua mao: ")
+        val cardsName: List<String> = player.getCardNames()
+        cardsName.forEachIndexed { cardIndex, cardName ->
+            println("$cardIndex- $cardName")
+        }
+
+        println("Digite o numero da carta que deseja descartar: ")
+        var cardIndex = readln().toIntOrNull()
+        while(cardIndex == null) {
+            print("Digite um valor válido")
+            cardIndex = readln().toIntOrNull()
+        }
+
+        player.removeCard(cardIndex)
+    }
+
+    private fun showCurrentHand(player: Player) {
+        print("Mao atual de ${player.name}:\n$")
+        val headers = listOf("Nome Carta", "ATK Base", "DEF Base", "Tipo", "Descricao")
+        val cards = player.getCardList()
+        val colWidths = headers.indices.map { i ->
+            maxOf(
+                headers[i].length,
+                cards.maxOfOrNull {
+                    when (i) {
+                        0 -> it.name.length
+                        1 -> it.attack.toString().length
+                        2 -> it.defense.toString().length
+                        3 -> it.type.toString().length
+                        4 -> it.description.length
+                        else -> 0
+                    }
+                } ?: 0
+            )
+        }
+
+        printSeparator(colWidths)
+        printRow(headers, colWidths)
+        printSeparator(colWidths)
+
+        for (card in cards) {
+            val row = listOf(
+                card.name,
+                card.attack.toString(),
+                card.defense.toString(),
+                card.type.toString(),
+                card.description
+            )
+            printRow(row, colWidths)
+        }
+
+        printSeparator(colWidths)
+        println()
     }
 
     private fun performAttack(player: Player) {
