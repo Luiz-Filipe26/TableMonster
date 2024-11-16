@@ -10,6 +10,10 @@ class Player(
         life -= damage
     }
 
+    fun getCurrentLife(): Int {
+        return life
+    }
+
     fun receiveCard(card: Card) {
         cardList.add(card)
     }
@@ -28,6 +32,10 @@ class Player(
 
     fun getMonstersCardsNames(): List<String> {
         return cardList.filter{ it.type == CardType.MONSTER }.map{ it.name }
+    }
+
+    fun getMonsterByIndex(index: Int): Monster {
+        return monstersList[index]
     }
 
     fun getEquipamentCardNames(): List<String> {
@@ -56,6 +64,10 @@ class Player(
 
     fun removeCard(cardPosition: Int) {
         cardList.removeAt(cardPosition)
+    }
+
+    fun removeMonster(monterIndex: Int) {
+        monstersList.removeAt(monterIndex)
     }
 
     fun getCardByName(cardName: String): Card? {

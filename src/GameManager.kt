@@ -1,3 +1,5 @@
+import kotlin.math.abs
+
 class GameManager {
     private val players: MutableList<Player> = mutableListOf()
     private var currentTurn = 0
@@ -32,6 +34,9 @@ class GameManager {
         val isGameRunning = true
         while (isGameRunning) {
             val currentPlayer: Player = players[currentTurn]
+            val opponnent: Player = players[1 - currentTurn]
+
+            printTableState(players)
 
             println("Vez do jogador ${currentPlayer.name}.")
             getNewCardFromDrawPile(currentPlayer)
@@ -49,7 +54,7 @@ class GameManager {
                 "1" -> positionNewMonster(currentPlayer)
                 "2" -> equipMonster(currentPlayer)
                 "3" -> discardCard(currentPlayer)
-                "4" -> performAttack(currentPlayer)
+                "4" -> performAttack(currentPlayer, opponnent)
                 "5" -> changeMonsterState(currentPlayer)
                 "6" -> skipTurn(currentPlayer)
                 else -> println("Opção inválida") // Essa linha não deve ser atingida
@@ -57,8 +62,6 @@ class GameManager {
 
             currentTurn++
             currentTurn %= NUMBER_OF_PLAYERS
-
-            printTableState(players)
         }
     }
 
@@ -92,10 +95,12 @@ class GameManager {
     }
 
     private fun printTableState(playerList: List<Player>) {
-        val headers = listOf("Nome Carta", "ATK Base", "DEF Base", "Total ATK", "Total DEF", "Equipamento(s)")
+        val headers = listOf("Nome Carta", "ATK Base", "DEF Base", "Total ATK", "Total DEF", "Equipamento(s)", "Estado")
+
+        println("\n\t\t\t\t\t\t\t\tMESA ATUAL")
 
         for (player in playerList) {
-            println("Tabuleiro do(a) ${player.name}:")
+            println("${player.name} | Vida total ${player.getCurrentLife()}:")
 
             val monsters = player.getMonsterList()
 
@@ -111,6 +116,7 @@ class GameManager {
                             3 -> it.totalAttack().toString().length
                             4 -> it.totalDefense().toString().length
                             5 -> it.getEquipamentName().joinToString(", ").length
+                            6 -> (if(!it.isInDefenseState) "Ataque" else "Defesa").length
                             else -> 0
                         }
                     } ?: 0
@@ -129,7 +135,8 @@ class GameManager {
                     monster.defense.toString(),
                     monster.totalAttack().toString(),
                     monster.totalDefense().toString(),
-                    monster.getEquipamentName().joinToString(", ")
+                    monster.getEquipamentName().joinToString(", "),
+                    if(!monster.isInDefenseState) "Ataque" else "Defesa"
                 )
                 printRow(row, colWidths)
             }
@@ -322,8 +329,66 @@ class GameManager {
         println()
     }
 
-    private fun performAttack(player: Player) {
+    private fun performAttack(player: Player, opponnet: Player) {
         println("${player.name} está realizando um ataque...")
+
+        val monstersName = player.getMonsterNames()
+        val opponnetMonstersName = opponnet.getMonsterNames()
+
+        if (monstersName.isEmpty() || opponnetMonstersName.isEmpty()) {
+            print("Nao ha nenhum monstro posicionado")
+            return
+        }
+
+        println("Monstros posicionados:")
+        monstersName.forEachIndexed { cardIndex, cardName ->
+            println("$cardIndex- $cardName")
+        }
+
+        print("Digite o número do monstro que deseja utilizar para atacar: ")
+        var monsterIndex = readln().toIntOrNull()
+        while(monsterIndex == null) {
+            print("Digite um valor válido")
+            monsterIndex = readln().toIntOrNull()
+        }
+
+        val monster: Monster = player.getMonsterByIndex(monsterIndex)
+
+        println("Monstros posicionados do oponente:")
+        opponnetMonstersName.forEachIndexed { cardIndex, cardName ->
+            println("$cardIndex- $cardName")
+        }
+
+        print("Digite o número do monstro que deseja atacar: ")
+        var opponnentMonsterIndex: Int? = readln().toIntOrNull()
+        while(opponnentMonsterIndex == null) {
+            print("Digite um valor válido")
+            opponnentMonsterIndex = readln().toIntOrNull()
+        }
+
+        val opponnentMonster: Monster = opponnet.getMonsterByIndex(monsterIndex)
+
+        val monsterAttkDefence: Int = if (!monster.isInDefenseState) monster.totalAttack() else monster.totalDefense()
+        val opponnentMonsterAttkDefence: Int = if (!opponnentMonster.isInDefenseState) opponnentMonster.totalAttack() else opponnentMonster.totalDefense()
+
+        val result = monsterAttkDefence - opponnentMonsterAttkDefence
+
+        val damage: Int = abs(result)
+
+        if(result < 0) {
+            player.receiveDamage(damage)
+            player.removeMonster(monsterIndex)
+            println("O monstro ${monster.name} foi destruido!\nVoce recebeu $damage de dano!")
+            return
+        }
+        if(result == 0) {
+            println("Ambos os monstros foram destruidos!")
+            return
+        }
+
+        opponnet.removeMonster(opponnentMonsterIndex)
+        opponnet.receiveDamage(result)
+        println("O monstro ${monster.name} do oponente foi destruido!\nVoce causou ao oponente $damage de dano!")
     }
 
     private fun changeMonsterState(player: Player) {
