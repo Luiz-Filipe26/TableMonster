@@ -31,7 +31,7 @@ class GameManager {
 
         val isGameRunning = true
         while (isGameRunning) {
-            val currentPlayer = players[currentTurn]
+            val currentPlayer: Player = players[currentTurn]
 
             println("Vez do jogador ${currentPlayer.name}.")
             getNewCardFromDrawPile(currentPlayer)
@@ -56,7 +56,7 @@ class GameManager {
             currentTurn++
             currentTurn %= NUMBER_OF_PLAYERS
 
-            printTableState()
+            printTableState(players)
         }
     }
 
@@ -89,7 +89,61 @@ class GameManager {
         player.removeCard(cardIndex)
     }
 
-    private fun printTableState() {
+    private fun printTableState(playerList: List<Player>) {
+        // Define table headers
+        val headers = listOf("Monster Name", "Base ATK", "Base DEF", "Total ATK", "Total DEF", "Equipment")
+
+        for (player in playerList) {
+            println("${player.name}'s Table:")
+
+            // Calculate column widths dynamically
+            val monsters = player.getMonsterList()
+            val colWidths = headers.indices.map { i ->
+                maxOf(
+                    headers[i].length,
+                    monsters.maxOfOrNull {
+                        when (i) {
+                            0 -> it.name.length
+                            1 -> it.attack.toString().length
+                            2 -> it.defense.toString().length
+                            3 -> it.totalAttack().toString().length
+                            4 -> it.totalDefense().toString().length
+                            5 -> it.getEquipamentName().joinToString(", ").length
+                            else -> 0
+                        }
+                    } ?: 0
+                )
+            }
+
+            // Print table header
+            printSeparator(colWidths)
+            printRow(headers, colWidths)
+            printSeparator(colWidths)
+
+            // Print each monster's details
+            for (monster in monsters) {
+                val row = listOf(
+                    monster.name,
+                    monster.attack.toString(),
+                    monster.defense.toString(),
+                    monster.totalAttack().toString(),
+                    monster.totalDefense().toString(),
+                    monster.getEquipamentName().joinToString(", ")
+                )
+                printRow(row, colWidths)
+            }
+
+            printSeparator(colWidths)
+            println()
+        }
+    }
+
+    private fun printSeparator(colWidths: List<Int>) {
+        println("+" + colWidths.joinToString("+") { "-".repeat(it + 2) } + "+")
+    }
+
+    private fun printRow(row: List<String>, colWidths: List<Int>) {
+        println("| " + row.mapIndexed { i, cell -> cell.padEnd(colWidths[i]) }.joinToString(" | ") + " |")
     }
 
     private fun printOptions() {
@@ -140,7 +194,8 @@ class GameManager {
         val monster = Monster(
             name = monsterName,
             isInDefenseState = monsterState == 2,
-            life = 100
+            attack = monsterCard.attack,
+            defense = monsterCard.defense
         )
 
         player.positionMonster(monster)
@@ -150,6 +205,13 @@ class GameManager {
 
     private fun equipMonster(player: Player) {
         println("${player.name} está equipando um monstro...")
+
+        val monstersName = player.getMonsterNames()
+
+        if (monstersName.isEmpty()) {
+            print("Nao ha nenhum monstro posicionado")
+            return
+        }
 
         val equipamentCardNames = player.getEquipamentCardNames()
 
@@ -175,13 +237,6 @@ class GameManager {
 
         if(equipamentCard == null) {
             println("Equipamento nao encontrado")
-            return
-        }
-
-        val monstersName = player.getMonsterNames()
-
-        if (monstersName.isEmpty()) {
-            print("Nao ha nenhum monstro posicionado")
             return
         }
 
