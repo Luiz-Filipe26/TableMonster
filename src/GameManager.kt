@@ -5,7 +5,7 @@ class GameManager {
     private var currentTurn = 0
     private val drawPile = Deck()
     private val NUMBER_OF_PLAYERS = 2
-    private val DEFAULT_PLAYER_LIFE = 10000
+    private val DEFAULT_PLAYER_LIFE = 1000
     companion object {
         const val MAXIMUM_NUMBER_OF_CARDS = 10
         const val MAXIMUM_NUMBER_OF_MONSTERS = 5
@@ -31,10 +31,19 @@ class GameManager {
             players.add(player)
         }
 
-        val isGameRunning = true
-        while (isGameRunning) {
+        while (true) {
             val currentPlayer: Player = players[currentTurn]
             val opponnent: Player = players[1 - currentTurn]
+
+            if(currentPlayer.getCurrentLife() <= 0) {
+                println("${opponnent.name} GANHOU o duelo !")
+                return
+            }
+
+            if(opponnent.getCurrentLife() <=0) {
+                println("${currentPlayer.name} GANHOU o duelo !")
+                return
+            }
 
             printTableState(players)
 
@@ -46,7 +55,7 @@ class GameManager {
             printOptions()
             var option = readln()
             while (option.length != 1 || !option.matches(Regex("[1-6]"))) {
-                print("Digite uma opção existente: ")
+                println("Digite uma opção existente: ")
                 option = readln()
             }
 
@@ -182,7 +191,7 @@ class GameManager {
         monstersCardsNames.forEachIndexed { cardIndex, cardName ->
             println("$cardIndex- $cardName")
         }
-        print("Digite o número do monstro que quer posicionar: ")
+        println("Digite o número do monstro que quer posicionar: ")
         var monsterIndex = readln().toIntOrNull()
         while(monsterIndex == null) {
             print("Digite um valor válido")
@@ -233,10 +242,10 @@ class GameManager {
             println("$cardIndex- $cardName")
         }
 
-        print("Digite o número do equipamento que deseja equipar: ")
+        println("Digite o número do equipamento que deseja equipar: ")
         var equipamentIndex = readln().toIntOrNull()
         while(equipamentIndex == null) {
-            print("Digite um valor válido")
+            println("Digite um valor válido")
             equipamentIndex = readln().toIntOrNull()
         }
 
@@ -256,7 +265,7 @@ class GameManager {
         print("Digite o número do monstro que deseja equipar: ")
         var monsterIndex = readln().toIntOrNull()
         while(monsterIndex == null) {
-            print("Digite um valor válido")
+            println("Digite um valor válido")
             monsterIndex = readln().toIntOrNull()
         }
 
@@ -291,7 +300,7 @@ class GameManager {
     }
 
     private fun showCurrentHand(player: Player) {
-        print("Mao atual de ${player.name}:\n$")
+        println("Mao atual de ${player.name}:\n$")
         val headers = listOf("Nome Carta", "ATK Base", "DEF Base", "Tipo", "Descricao")
         val cards = player.getCardList()
         val colWidths = headers.indices.map { i ->
@@ -336,7 +345,7 @@ class GameManager {
         val opponnetMonstersName = opponnet.getMonsterNames()
 
         if (monstersName.isEmpty() || opponnetMonstersName.isEmpty()) {
-            print("Nao ha nenhum monstro posicionado")
+            println("Nao ha nenhum monstro posicionado")
             return
         }
 
@@ -345,10 +354,10 @@ class GameManager {
             println("$cardIndex- $cardName")
         }
 
-        print("Digite o número do monstro que deseja utilizar para atacar: ")
+        println("Digite o número do monstro que deseja utilizar para atacar: ")
         var monsterIndex = readln().toIntOrNull()
         while(monsterIndex == null) {
-            print("Digite um valor válido")
+            println("Digite um valor válido")
             monsterIndex = readln().toIntOrNull()
         }
 
@@ -359,10 +368,10 @@ class GameManager {
             println("$cardIndex- $cardName")
         }
 
-        print("Digite o número do monstro que deseja atacar: ")
+        println("Digite o número do monstro que deseja atacar: ")
         var opponnentMonsterIndex: Int? = readln().toIntOrNull()
         while(opponnentMonsterIndex == null) {
-            print("Digite um valor válido")
+            println("Digite um valor válido")
             opponnentMonsterIndex = readln().toIntOrNull()
         }
 
@@ -393,6 +402,29 @@ class GameManager {
 
     private fun changeMonsterState(player: Player) {
         println("${player.name} está alterando o estado de um monstro...")
+
+        val monstersName = player.getMonsterNames()
+
+        if (monstersName.isEmpty()) {
+            print("Nao ha nenhum monstro posicionado")
+            return
+        }
+
+        println("Monstros posicionados:")
+        monstersName.forEachIndexed { cardIndex, cardName ->
+            println("$cardIndex- $cardName")
+        }
+
+        println("Digite o número do monstro que deseja alterar o estado: ")
+        var monsterIndex = readln().toIntOrNull()
+        while(monsterIndex == null) {
+            println("Digite um valor válido")
+            monsterIndex = readln().toIntOrNull()
+        }
+
+        val monster: Monster = player.getMonsterByIndex(monsterIndex)
+
+        monster.isInDefenseState = !monster.isInDefenseState
     }
 
     private fun skipTurn(player: Player) {
